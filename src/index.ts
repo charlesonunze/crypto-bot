@@ -1,8 +1,8 @@
-import HistoricalService from './services/historical';
+import BackTester from './tester';
 
 const main = async function () {
-	const data = await HistoricalService.getData();
-	console.log(data);
+	const tester = new BackTester();
+	await tester.start();
 };
 
 main();
