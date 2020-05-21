@@ -16,7 +16,7 @@ export interface CandleStick {
 }
 
 export enum CurrencyPair {
-  BTC_USD = 'BTCUSDT',
+  BTC_USD = 'BTCUSDT'
 }
 
 export enum CandlestickInterval {
@@ -34,19 +34,14 @@ export enum CandlestickInterval {
   ONE_DAY = '1d',
   THREE_DAYS = '3d',
   ONE_WEEK = '1w',
-  ONE_MONTH = '1M',
+  ONE_MONTH = '1M'
 }
 
-export type onBuySignal = (price: number, time: number) => void;
+export type onBuySignal = ({}: BuySignalData) => void;
 
-export type onSellSignal = (
-  price: number,
-  time: number,
-  amount: number,
-  position: Position
-) => void;
+export type onSellSignal = ({}: SellSignalData) => void;
 
-export interface BuySignal {
+export interface Signals {
   onBuySignal: onBuySignal;
   onSellSignal: onSellSignal;
 }
@@ -56,3 +51,27 @@ export interface Positions {
 }
 
 export type PositionState = 'open' | 'closed';
+
+export interface BuySignalData {
+  price: number;
+  time: number;
+}
+
+export interface SellSignalData {
+  price: number;
+  time: number;
+  amount: number;
+  position: Position;
+}
+
+export interface RunData {
+  candleSticks: CandleStick[];
+  time: number;
+}
+
+export interface PositionData {
+  price: number;
+  time: number;
+  amount: number;
+  id: string;
+}

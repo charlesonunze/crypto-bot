@@ -3,9 +3,10 @@ import Position from '../models/position';
 import {
   onBuySignal,
   onSellSignal,
-  BuySignal,
-  CandleStick,
   Positions,
+  RunData,
+  Signals,
+  PositionData
 } from '../types';
 
 abstract class Strategy {
@@ -13,13 +14,13 @@ abstract class Strategy {
   onBuySignal: onBuySignal;
   onSellSignal: onSellSignal;
 
-  constructor({ onBuySignal, onSellSignal }: BuySignal) {
+  constructor({ onBuySignal, onSellSignal }: Signals) {
     this.positions = {};
     this.onBuySignal = onBuySignal;
     this.onSellSignal = onSellSignal;
   }
 
-  abstract async run(candleSticks: CandleStick[], time: number): Promise<void>;
+  abstract async run({ candleSticks, time }: RunData): Promise<void>;
 
   getPositions() {
     return Object.keys(this.positions).map((k) => this.positions[k]);
@@ -29,23 +30,13 @@ abstract class Strategy {
     return this.getPositions().filter((p) => p.state === 'open');
   }
 
-  async positionOpened(
-    price: number,
-    time: number,
-    amount: number,
-    id: string
-  ) {
+  async positionOpened({ price, time, amount, id }: PositionData) {
     const trade = new Trade(price, time, amount);
     const position = new Position(trade, id);
     this.positions[id] = position;
   }
 
-  async positionClosed(
-    price: number,
-    time: number,
-    amount: number,
-    id: string
-  ) {
+  async positionClosed({ price, time, amount, id }: PositionData) {
     const trade = new Trade(price, time, amount);
     const position = this.positions[id];
     if (position) position.close(trade);

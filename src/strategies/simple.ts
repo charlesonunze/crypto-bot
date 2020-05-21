@@ -1,8 +1,8 @@
 import Strategy from './strategy';
-import { CandleStick } from '../types';
+import { RunData } from '../types';
 
 class SimpleStrategy extends Strategy {
-  async run(candleSticks: CandleStick[], time: number) {
+  async run({ candleSticks, time }: RunData) {
     const _length = candleSticks.length;
     if (_length < 50) return;
 
@@ -14,13 +14,14 @@ class SimpleStrategy extends Strategy {
 
     if (openPositions.length == 0) {
       if (lastStickPrice < penultimateStickPrice) {
-        return this.onBuySignal(price, time);
+        return this.onBuySignal({ price, time });
       }
     } else if (lastStickPrice > penultimateStickPrice) {
       {
-        openPositions.forEach((p) => {
-          if (p.enter.price * 1.01 < price) {
-            this.onSellSignal(price, time, p.enter.amount, p);
+        openPositions.forEach((position) => {
+          if (position.enter.price * 1.01 < price) {
+            const amount = position.enter.amount;
+            this.onSellSignal({ price, time, amount, position });
           }
         });
       }
