@@ -75,3 +75,8 @@ export interface PositionData {
   amount: number;
   id: string;
 }
+
+export interface RunnerData {
+  startTime: string;
+  strategy: string;
+}
