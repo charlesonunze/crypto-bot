@@ -1,26 +1,12 @@
-import HistoricalService from '../services/historical';
-import { SimpleStrategy } from '../strategies';
 import { genRandomString } from '../utils';
-import { red, green } from 'colors';
-import Strategy from '../strategies/strategy';
-import { CandleStick, BuySignalData, SellSignalData } from '../types';
+import { BuySignalData, SellSignalData } from '../types';
+import Runner from '../runner';
 
-class BackTester {
-  strategy!: Strategy;
-
+class BackTester extends Runner {
   async start() {
-    const historicalData: CandleStick[] = await HistoricalService.getData();
+    const historicalData = await this.historicalService.getData();
 
-    this.strategy = new SimpleStrategy({
-      onBuySignal: ({ price, time }) => {
-        this._onBuySignal({ price, time });
-      },
-      onSellSignal: ({ price, time, amount, position }) => {
-        this._onSellSignal({ price, time, amount, position });
-      }
-    });
-
-    const tasks = historicalData.map((stick: CandleStick, index: number) => {
+    const tasks = historicalData.map((stick, index) => {
       const candleSticks = historicalData.slice(0, index + 1);
       const time = stick.openTime;
       return this.strategy.run({ candleSticks, time });
@@ -28,13 +14,8 @@ class BackTester {
 
     await Promise.all(tasks);
 
-    const positions = this.strategy.getPositions();
-    positions.forEach((p) => p.print());
-
-    const total = positions.reduce((sum, p) => sum + p.profit(), 0);
-
-    const colored = total > 0 ? green(`${total}`) : red(`${total}`);
-    console.log(`Total Profit: ${colored}`);
+    this.printPosition();
+    this.printProfit();
   }
 
   async _onBuySignal({ price, time }: BuySignalData) {

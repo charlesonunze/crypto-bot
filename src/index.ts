@@ -10,7 +10,13 @@ program
   .parse(process.argv);
 
 const main = async function () {
-  const tester = new BackTester();
+  const { time, strategy } = program;
+
+  const tester = new BackTester({
+    strategy,
+    startTime: time
+  });
+
   await tester.start();
 };
 
